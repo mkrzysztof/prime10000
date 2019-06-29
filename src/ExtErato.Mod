@@ -1,15 +1,16 @@
 (* extended version of Eratostenes' algorithm *)
 MODULE ExtErato;
   IMPORT
-    ST := ShiftTable, GT := GrowingTable;
+    ST := ShiftTable, GT := GrowingTable, Out;
     
-  PROCEDURE EliminateMult(VAR primes: GT.GrowingTable; 
+  PROCEDURE EliminateMult(primes: GT.GrowingTable; 
                           VAR candidates: ST.ShiftTable);
   (** output:
     candidates[k] = FALSE where k = j * p; j= 2,3... p in primes *)
   VAR
     i: LONGINT;
     low, high: LONGINT;
+    getMsg: GT.GetMsg;
     PROCEDURE EliminateMultP(low, high, prime: LONGINT);
     VAR
       j: LONGINT;
@@ -21,7 +22,8 @@ MODULE ExtErato;
   BEGIN
     low := candidates.lowIndex; high := candidates.highIndex;
     FOR i := 0 TO primes.length - 1 DO
-      EliminateMultP(low, high, GT.Get(primes, i));
+      getMsg.index := i; primes.handle(primes, getMsg);
+      EliminateMultP(low, high, getMsg.out);
     END;
   END EliminateMult;
 
@@ -56,14 +58,17 @@ MODULE ExtErato;
     END;
   END LocalSieve;
   
-  PROCEDURE AddPrimeNumbers(VAR primes: GT.GrowingTable;
+  PROCEDURE AddPrimeNumbers(primes: GT.GrowingTable;
                             VAR candidates: ST.ShiftTable);
   VAR
     low, high, i: LONGINT;
+    addMsg: GT.AddMsg;
   BEGIN
     low := candidates.lowIndex; high := candidates.highIndex;
     FOR i := low TO high DO
-      IF ST.Get(candidates, i) THEN GT.Add(primes, i); END;
+      IF ST.Get(candidates, i) THEN
+          addMsg.element := i; primes.handle(primes, addMsg)
+      END;
     END;
   END AddPrimeNumbers;
   
@@ -84,15 +89,20 @@ MODULE ExtErato;
     primes: GT.GrowingTable;
     candidates: ST.ShiftTable;
     start, stop: LONGINT;
+    retValue: LONGINT;
+    addMsg: GT.AddMsg;
+    getMsg: GT.GetMsg;
   BEGIN
-    GT.Init(primes);
-    GT.Add(primes, 2);
+    primes := GT.New();
+    addMsg.element := 2; primes.handle(primes, addMsg);
     start := 2; stop := start + PART;
     WHILE primes.length <= nthNumber DO
       ST.Init(candidates, start, stop);
       PartErato(primes, candidates);
       start := stop + 1; stop := start + PART;
     END;
-    RETURN GT.Get(primes, nthNumber - 1);
+    getMsg.index := nthNumber - 1; primes.handle(primes, getMsg);
+    retValue := getMsg.out;
+    RETURN retValue;
   END Erato;
 END ExtErato.
