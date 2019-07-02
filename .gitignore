@@ -4,3 +4,7 @@ bin
 obj
 sym
 Test
+*.c
+*.h
+*.o
+*.sym
