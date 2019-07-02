@@ -5,7 +5,7 @@ IMPORT Out;
     maxElems = 200000;
     
   TYPE
-    Message = RECORD END;
+    Message* = RECORD END;
     GetMsg* = RECORD (Message)
       index*: LONGINT;
       out*: LONGINT;

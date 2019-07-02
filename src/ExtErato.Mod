@@ -11,19 +11,18 @@ MODULE ExtErato;
     i: LONGINT;
     low, high: LONGINT;
     getMsg: GT.GetMsg;
-    PROCEDURE EliminateMultP(low, high, prime: LONGINT);
+    PROCEDURE EliminateMultP(prime: LONGINT);
     VAR
       j: LONGINT;
     BEGIN
-       FOR j := low TO high DO
+       FOR j := candidates.lowIndex TO candidates.highIndex DO
           IF (j MOD prime) = 0 THEN ST.Put(candidates, j, FALSE); END;
        END;
     END EliminateMultP;
   BEGIN
-    low := candidates.lowIndex; high := candidates.highIndex;
     FOR i := 0 TO primes.length - 1 DO
       getMsg.index := i; primes.handle(primes, getMsg);
-      EliminateMultP(low, high, getMsg.out);
+      EliminateMultP(getMsg.out);
     END;
   END EliminateMult;
 
